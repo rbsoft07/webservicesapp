@@ -82,6 +82,12 @@ public class EmpleadoServicesWS {
 		if (empleado == null) {
 			return Response.status(400).entity("No se ingresó informacion del empleado, favor verificar los datos ").build();
 		}
+		
+		
+		if (empleado.getNumeroEmpleado() == null || empleado.getNumeroEmpleado().isEmpty()) {
+			return Response.status(400).entity("El Numero Empleado es Requerido").build();
+		}
+		
 		if (empleado.getNombre() == null || empleado.getNombre().isEmpty()) {
 			return Response.status(400).entity("El nombre es Requerido").build();
 		}
