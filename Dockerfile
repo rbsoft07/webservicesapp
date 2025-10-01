@@ -3,11 +3,14 @@ FROM maven:3.8.4-openjdk-17-slim AS build
 
 WORKDIR /app
 #Copiamos el archivo pom.xml a la ruta raiz.
+
 COPY pom.xml /
+
 #Descarga de las dependencias indicadas en el pom.xml 
-RUN mvn dependency:go-offline
+RUN mvn dependency
 
 COPY src ./src
+
 #Limpia y empaqueta la aplicacion saltando las pruebas unitarias.
 RUN mvn clean package -DskipTests
 
