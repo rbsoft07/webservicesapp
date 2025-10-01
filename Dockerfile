@@ -1,29 +1,45 @@
-#Etapa 1 Primera parte de la construccion para el War de la aplicacion.
-FROM maven:3.8.4-openjdk-17-slim AS build
+# Multi-stage build para optimizar la imagen final
+FROM tomcat:10.1-jdk17-temurin-jammy AS builder
 
-WORKDIR /app
-#Copiamos el archivo pom.xml a la ruta raiz.
+# Metadata
+LABEL maintainer="tu-email@example.com"
+LABEL description="API REST Java con Tomcat"
 
-COPY pom.xml /
+# Argumentos de build
+ARG WAR_FILE=target/*.war
+ARG APP_NAME=api
 
-#Descarga de las dependencias indicadas en el pom.xml 
-RUN mvn install
+# Remover aplicaciones por defecto de Tomcat
+RUN rm -rf /usr/local/tomcat/webapps/*
 
-COPY src /src
+# Copiar el WAR al webapps de Tomcat
+COPY ${WAR_FILE} /usr/local/tomcat/webapps/${APP_NAME}.war
 
-#Limpia y empaqueta la aplicacion saltando las pruebas unitarias.
-RUN mvn clean package -DskipTests
+# Imagen final - más ligera
+FROM tomcat:10.1-jdk17-temurin-jammy
 
-#Lista los archivos generados en la ruta target 
-RUN ls -la /app/target
+# Variables de entorno para optimización
+ENV CATALINA_OPTS="-Xms512m -Xmx1024m -XX:+UseG1GC -Djava.security.egd=file:/dev/./urandom"
+ENV JAVA_OPTS="-Djava.awt.headless=true"
 
-#Etapa 2 Construcion de la imagen final 
-FROM openjdk:17-jdk-alpine
+# Argumentos
+ARG APP_NAME=api
 
-WORKDIR /app
+# Remover aplicaciones default
+RUN rm -rf /usr/local/tomcat/webapps/*
 
-COPY --from=build  /app/target/webservicesapp.0.0.1-SNAPSHOT.war /app/webservicesappV1.0.war
-#Se expone la aplicacion para ejecutarse en el puerto 9191 Produccion.
-EXPOSE 9191
+# Copiar el WAR desde el builder
+COPY --from=builder /usr/local/tomcat/webapps/${APP_NAME}.war /usr/local/tomcat/webapps/ROOT.war
 
-CMD ["java", "-jar", "webservicesappV1.0.war"]
+# Configurar servidor.xml para producción (opcional)
+# COPY server.xml /usr/local/tomcat/conf/server.xml
+
+# Exponer puerto (Render usa la variable PORT)
+EXPOSE 8080
+
+# Health check
+#HEALTHCHECK --interval=30s --timeout=3s --start-period=40s --retries=3 \
+ # CMD curl -f http://localhost:8080/ || exit 1
+
+# Comando de inicio
+CMD ["catalina.sh", "run"]
