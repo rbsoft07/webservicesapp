@@ -7,7 +7,7 @@ WORKDIR /app
 COPY pom.xml /
 
 #Descarga de las dependencias indicadas en el pom.xml 
-RUN mvn dependency
+RUN mvn install
 
 COPY src /src
 
