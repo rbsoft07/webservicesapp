@@ -9,7 +9,7 @@ COPY pom.xml /
 #Descarga de las dependencias indicadas en el pom.xml 
 RUN mvn dependency
 
-COPY src ./src
+COPY src /src
 
 #Limpia y empaqueta la aplicacion saltando las pruebas unitarias.
 RUN mvn clean package -DskipTests
