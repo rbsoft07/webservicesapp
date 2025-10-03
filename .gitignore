@@ -56,7 +56,7 @@ Thumbs.db
 .mtj.tmp/
 
 # Package Files #
-*.war
+*.jar
 *.nar
 *.ear
 *.zip
@@ -67,3 +67,4 @@ Thumbs.db
 hs_err_pid*
 replay_pid*
 
+/target/
