@@ -56,7 +56,7 @@ Thumbs.db
 .mtj.tmp/
 
 # Package Files #
-*.war
+*.jar
 *.nar
 *.ear
 *.zip
